@@ -39,6 +39,7 @@
             return true;
         } // 잘 입력했는지 검사하는 코드
 
+        let out = 0; // 아웃 횟수 저장할 변수
         $form.addEventListener('submit', (event) => { // form의 기본동작 '새로고침' => 저장해놓은 변수가 날아감
             event.preventDefault(); //기본동작 막기
             const value = $input.value;
@@ -67,11 +68,19 @@
                     }
                 }
             }
-            $logs.append(`${value}: ${strike} 스트라이크 ${ball} 볼`, document.createElement('br'));
-            tries.push(value);
+            if (strike > 0 || ball > 0) {
+                $logs.append(`${value}: ${strike} 스트라이크 ${ball} 볼`, document.createElement('br'));
+                tries.push(value);
+            }
+            if (out >= 2) { // 삼진아웃
+                const outmessage = document.createTextNode(`삼진아웃! 정답은 ${answer.join('')}`, document.createElement('br'));
+                $logs.appendChild(outmessage);
+                return;
+            } else { // 아웃 횟수 세기
+                out += 1;
+                logs.append(`${value}: ${out} 아웃`, document.createElement('br'));
+            }
         });
-
     </script>
 </body>
-
 </html>
