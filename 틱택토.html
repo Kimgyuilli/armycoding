@@ -28,16 +28,8 @@
         const rows = [];
 
         const checkWinner = (target) => {
-            let rowIndex;
-            let cellIndex;
-            rows.forEach((row, ri) => {
-                row.forEach((cell, ci) => {
-                    if (cell === target) {
-                        rowIndex = ri;
-                        cellIndex = ci;
-                    }
-                });
-            });
+            const rowIndex = target.parentNode.rowIndex;
+            const cellIndex = target.cellIndex;
 
             // 세 칸 다 채워졌나?
             let hasWinner = false;
@@ -82,19 +74,14 @@
             }
             console.log('빈칸입니다.')
             event.target.textContent = turn;
+            
             if (checkWinner(event.target)) { //승부 판단하기
                 $result.textContent = `${turn}님이 승리!`;
                 $table.removeEventListener('click', callback);
                 return;
             }
-            let draw = true; // 무승부 검사
-            rows.forEach((row) => {
-                row.forEach((cell) => {
-                    if (!cell.textContent) {
-                        draw = false;
-                    }
-                });
-            });
+
+            const draw = rows.flat().every((cell) => cell.textContent); // 무승부 검사
             if (draw) {
                 $result.textContent = `무승부`;
                 return; 
