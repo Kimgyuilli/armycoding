@@ -81,10 +81,45 @@
             card.appendChild(cardInner);
             return card;
         }
+
+        function onClickCard() {
+            if (!clickable || completed.includes(this) || clicked[0] === this) { // 클릭이 안될 때, 이미 완성된 카드, 현재 클릭한 카드 클릭 막기
+                return;
+            }
+            this.classList.toggle('flipped');
+            clicked.push(this);
+            if (clicked.length !== 2) {
+                return;
+            }
+            const firstBackColor = clicked[0].querySelector('.card-back').style.backgroundColor;
+            const secondBackcolor = clicked[1].querySelector('.card-back').style.backgroundColor;
+            if (firstBackColor === secondBackcolor) { //두 카드가 같은 카드면
+                completed.push(clicked[0]);
+                completed.push(clicked[1]);
+                clicked = []; // 위 세줄 합치면 completed.concat(clicked);
+                if (completed.length !== total) {
+                    return;
+                }
+                setTimeout(() => {
+                    alert(`축하합니다!`);
+                    resetGame();
+                }, 1000);
+                return;
+            }
+            setTimeout(() => {
+                clicked[0].classList.remove('flipped');
+                clicked[1].classList.remove('flipped');
+                clicked = [];
+            }, 1000);
+
+        }
+
         function startGame() {
+            clickable = false;
             shuffle();
             for (let i = 0; i < total; i += 1) {
                 const card = createCard(i);
+                card.addEventListener('click', onClickCard);
                 $wrapper.appendChild(card);
             }
 
@@ -98,11 +133,17 @@
                 document.querySelectorAll('.card').forEach((card) => {
                     card.classList.remove('flipped');
                 });
-            }, 5000); 
+                clickable = true;
+            }, 5000);
         }
-
         startGame();
-
+        function resetGame() {
+            $wrapper.innerHTML = '';
+            colorCopy = colors.concat(colors);
+            shuffled = [];
+            completed = [];
+            startGame();
+        }
     </script>
 </body>
 
