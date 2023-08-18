@@ -110,7 +110,7 @@
                 target.textContent = '';
             }
         }
-        function open(){ //지뢰 여는 함수
+        function open(rowIndex, cellIndex) { //지뢰 여는 함수
 
         }
         function countMine(rowIndex, cellIndex) {
@@ -127,7 +127,19 @@
             return i;
         }
 
-        function openAround() { // 주변 지뢰 여는 함수
+        function openAround(rI, cI) { // 주변 지뢰 여는 함수
+            const count = open(rI, cI); // 내 칸을 열고
+            if (count === 0) { //주변 칸 열기
+                open(rI - 1, cI - 1);
+                open(rI - 1, cI);
+                open(rI - 1, cI + 1);
+                open(rI, cI - 1);
+                open(rI, cI + 1);
+                open(rI + 1, cI - 1);
+                open(rI + 1, cI);
+                open(rI + 1, cI + 1);
+
+            }
         }
 
         function onLeftClick(event) {
@@ -136,10 +148,7 @@
             const cellIndex = target.cellIndex;
             const cellData = data[rowIndex][cellIndex];
             if (cellData === CODE.NORMAL) { //닫힌 칸이면
-                const count = countMine(rowIndex, cellIndex);
-                target.textContent = count || ''; //count가 없으면 뒤에를 실행해라. ||대신에 ??(nullish coalescing operator) 를 사용하면 0도 인식해서 처리할 수 있다.
-                target.className = 'opened';
-                data[rowIndex][cellIndex] = count;
+                openAround(rowIndex, cellIndex);
             } else if (cellData === CODE.MINE) { // 지뢰칸이면
                 target.textContent = '펑';
                 target.className = 'opened';
