@@ -110,8 +110,19 @@
                 target.textContent = '';
             }
         }
-        function open(rowIndex, cellIndex) { //지뢰 여는 함수
 
+        function open(rowIndex, cellIndex) { //지뢰 여는 함수
+            if(data[rowIndex]?.[cellIndex] >= CODE.OPENED) return;
+            const target = $tbody.children[rowIndex]?.children[cellIndex];
+            if (!target) {
+                console.log('b');
+                return;
+            }
+            const count = countMine(rowIndex, cellIndex);
+            data[rowIndex][cellIndex] = count;
+            target.className = 'opened';
+            target.textContent = count || '';
+            return count;
         }
         function countMine(rowIndex, cellIndex) {
             let i = 0;
@@ -128,18 +139,19 @@
         }
 
         function openAround(rI, cI) { // 주변 지뢰 여는 함수
-            const count = open(rI, cI); // 내 칸을 열고
-            if (count === 0) { //주변 칸 열기
-                open(rI - 1, cI - 1);
-                open(rI - 1, cI);
-                open(rI - 1, cI + 1);
-                open(rI, cI - 1);
-                open(rI, cI + 1);
-                open(rI + 1, cI - 1);
-                open(rI + 1, cI);
-                open(rI + 1, cI + 1);
-
-            }
+            setTimeout(() => {
+                const count = open(rI, cI); // 내 칸을 열고
+                if (count === 0) { //주변 칸 열기
+                    openAround(rI - 1, cI - 1);
+                    openAround(rI - 1, cI);
+                    openAround(rI - 1, cI + 1);
+                    openAround(rI, cI - 1);
+                    openAround(rI, cI + 1);
+                    openAround(rI + 1, cI - 1);
+                    openAround(rI + 1, cI);
+                    openAround(rI + 1, cI + 1);
+                }
+            }, 0);
         }
 
         function onLeftClick(event) {
@@ -152,7 +164,7 @@
             } else if (cellData === CODE.MINE) { // 지뢰칸이면
                 target.textContent = '펑';
                 target.className = 'opened';
-                $tbody.removeListener('contextmenu', onRightClick);
+                $tbody.removeEventListener('contextmenu', onRightClick);
                 $tbody.removeEventListener('click', onLeftClick);
             }
         }
