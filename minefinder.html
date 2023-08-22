@@ -152,7 +152,6 @@
             target.className = 'opened';
             target.textContent = count || '';
             ++openCount;
-            console.log(openCount);
             if (openCount === row * cell - mine) {
                 const time = (new Date() - startTime) / 1000;
                 $tbody.removeEventListener('contextmenu', onRightClick);
@@ -178,6 +177,28 @@
             return i;
         }
 
+        let normalCellFound = false;
+        let searched;
+        let firstClick = true;
+        function moveMine(rowIndex, cellIndex) {
+            if (normalCellFound) return;
+            if (rowIndex < 0 || rowIndex >= row || cellIndex < 0 || cellIndex >= cell) return;
+            if (searched[rowIndex][cellIndex]) return;
+            if (data[rowIndex][cellIndex] === CODE.NORMAL) {//빈칸을 찾았으면
+                data[rowIndex][cellIndex] = CODE.MINE;
+                normalCellFound = true;
+            } else {
+                searched[rowIndex][cellIndex] = true;
+                moveMine(rowIndex - 1, cellIndex - 1);
+                moveMine(rowIndex - 1, cellIndex);
+                moveMine(rowIndex - 1, cellIndex + 1);
+                moveMine(rowIndex, cellIndex - 1);
+                moveMine(rowIndex, cellIndex + 1);
+                moveMine(rowIndex + 1, cellIndex - 1);
+                moveMine(rowIndex + 1, cellIndex);
+                moveMine(rowIndex + 1, cellIndex + 1);
+            }
+        }
         function openAround(rI, cI) { // 주변 지뢰 여는 함수
             setTimeout(() => {
                 const count = open(rI, cI); // 내 칸을 열고
@@ -194,16 +215,34 @@
             }, 0);
         }
 
+        function showMines() {
+            const mines = [CODE.MINE, CODE.QUESTION_MINE, CODE.FLAG_MINE]
+            data.forEach((row, rowIndex) => {
+                row.forEach((cell, cellIndex) => {
+                    if (mines.includes(cell)){
+                        $tbody.children[rowIndex].children[cellIndex].textContent = 'X';
+                    }
+                })
+            })
+        }
+
         function onLeftClick(event) {
             const target = event.target;
             const rowIndex = target.parentNode.rowIndex;
             const cellIndex = target.cellIndex;
-            const cellData = data[rowIndex][cellIndex];
+            let cellData = data[rowIndex][cellIndex];
+            if (openCount === 0 && cellData === CODE.MINE) {
+                searched = Array(row).fill().map(() => []);
+                moveMine(rowIndex, cellIndex);
+                data[rowIndex][cellIndex] = CODE.NORMAL;
+                cellData = CODE.NORMAL;
+            }
             if (cellData === CODE.NORMAL) { //닫힌 칸이면
                 openAround(rowIndex, cellIndex);
             } else if (cellData === CODE.MINE) { // 지뢰칸이면
                 target.textContent = '펑';
                 target.className = 'opened';
+                showMines();
                 $tbody.removeEventListener('contextmenu', onRightClick);
                 $tbody.removeEventListener('click', onLeftClick);
                 clearInterval(interval);
