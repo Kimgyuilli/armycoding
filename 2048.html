@@ -1,0 +1,141 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048</title>
+    <style>
+        #table {
+            border-collapse: cone;
+            user-select: none;
+        }
+
+        #table td {
+            border: 10px solid #bbada0;
+            width: 116px;
+            height: 128px;
+            font-size: 50px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #score {
+            user-select: none;
+        }
+
+        .color-2 {
+            background-color: #eee4da;
+            color-scheme: #776e65;
+        }
+
+        .color-4 {
+            background-color: #eee1c9;
+            color-scheme: #776e65;
+        }
+
+        .color-8 {
+            background-color: #f3b27a;
+            color-scheme: 'white';
+        }
+
+        .color-16 {
+            background-color: #f69664;
+            color-scheme: 'white';
+        }
+
+        .color-32 {
+            background-color: #f77c5f;
+            color-scheme: 'white';
+        }
+
+        .color-64 {
+            background-color: #f75f3b;
+            color-scheme: 'white';
+        }
+
+        .color-128 {
+            background-color: #edd073;
+            color-scheme: #776e65;
+        }
+
+        .color-256 {
+            background-color: #edcc62;
+            color-scheme: #776e65;
+        }
+
+        .color-512 {
+            background-color: #edc950;
+            color-scheme: #776e65;
+        }
+
+        .color-1024 {
+            background-color: #edc53f;
+            color-scheme: #776e65;
+        }
+
+        .color-2048 {
+            background-color: #edc22e;
+            color-scheme: #776e65;
+        }
+    </style>
+</head>
+
+<body>
+    <table id="table"></table>
+    <div id="score">0</div>
+    <script>
+        $table = document.getElementById('table');
+        $score = document.getElementById('score');
+        let data = [];
+
+        function startGame() {
+            const $fragment = document.createDocumentFragment();
+            [1, 2, 3, 4].forEach(function () {
+                const rowData = [];
+                data.push(rowData);
+                const $tr = document.createElement('tr');
+                [1, 2, 3, 4].forEach(function () {
+                    rowData.push(0);
+                    const $td = document.createElement('td');
+                    $tr.appendChild($td);
+                });
+                $fragment.appendChild($tr);
+            });
+            $table.appendChild($fragment); //하나씩 데이터에 추가하면 실행 시간이 길어지니 메모리에 그린 다음에 한번에 추가.
+            put2ToDataTable();
+            draw();
+
+        }
+
+        function put2ToDataTable() {
+            const emptyCells = [];
+            data.forEach(function (rowData, i) {
+                rowData.forEach(function (cellData, j) {
+                    if (!cellData) {
+                        emptyCells.push([i, j]);
+                    }
+                });
+            });
+            const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            data[randomCell[0]][randomCell[1]] = 2;
+        }
+
+        function draw() {
+            data.forEach(function (rowData, i) {
+                rowData.forEach(function (cellData, j) {
+                    const $target = $table.children[i].children[j];
+                    if (cellData > 0) {
+                        $target.textContent = cellData;
+                        $target.className = 'color-' + cellData;
+                    } else {
+                        $target.textContentt = '';
+                        $target.className = '';
+                    }
+                });
+            });
+        }
+        startGame();
+    </script>
+</body>
+
+</html>
