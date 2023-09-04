@@ -135,6 +135,104 @@
             });
         }
         startGame();
+
+        data = [
+            [0, 2, 4, 2],
+            [0, 0, 8, 0],
+            [2, 2, 4, 8],
+            [0, 16, 0, 4],
+        ];
+        draw();
+
+        let moveStartX;
+        let moveStartY;
+        let XposFlag = false;
+        let YposFlag = false;
+
+
+        function moveCells(direction) {
+            switch (direction) {
+                case 'left':
+                    const newData = [[], [], [], []];
+                    data.forEach((rowData, i) => {
+                        rowData.forEach((cellData, j) => {
+                            if (cellData) {
+                                newData[i].push(cellData);
+                            }
+                        });
+                    });
+                    console.log(newData);
+                    [1, 2, 3, 4].forEach((rowData, i) => {
+                        [1, 2, 3, 4].forEach((cellData, j) => {
+                            if (!newData[i][j]) {
+                                data[i][j] = 0;
+                            } else data[i][j] = newData[i][j];
+                        });
+                    });
+                    break;
+                case 'right':
+                    break;
+                case 'up':
+                    break;
+                case 'down':
+                    break;
+            }
+            draw();
+        }
+
+        window.addEventListener('keyup', (event) => {
+            if (event.key === 'ArrowUp') {
+                moveCells('up');
+            } else if (event.key === 'ArrowDown') {
+                moveCells('down');
+            } else if (event.key === 'ArrowLeft') {
+                moveCells('left');
+            } else if (event.key === 'ArrowRight') {
+                moveCells('right');
+            }
+        });
+
+        window.addEventListener('mousedown', (event) => {
+            moveStartX = event.pageX;
+            moveStarty = event.pagey;
+            //startCoord = [event.clientX, event,clientY];
+        });
+
+        window.addEventListener('mouseup', (event) => {
+            //const endCoord = [event.clientX, event.clientY];
+            //const diffX = endCoord[0] - startCoord[0];
+            //const diffY = endCoord[1] - startCoord[1];
+            //if (diffX < 0 && Math.abs(diffX) > math.abs(diffY)){
+            //   moveCells('left');
+            //} else if (diffX > 0 && Math.abs(diffX) > math.abs(diffY)){
+            //   moveCells('right');
+            //} else if (diffY > 0 && Math.abs(diffX) <= math.abs(diffY)){
+            //   moveCells('down');
+            //} else if (diffY < 0 && Math.abs(diffX) <= math.abs(diffY)){
+            //   moveCells('up');
+
+            if (moveStartX - event.pageX >= 0) { // x 이동거리가 양수일경우
+                XposFlag = true;
+            }
+            if (moveStartY - event.pageY >= 0) { // y 이동거리가 양수일경우
+                YposFlag = true;
+            }
+
+            if (Math.abs(moveStartX - event.page) >= Math.abs(moveStartY - event.pageY)) { // x 이동거리가 y이동거리보다 클 때
+                if (XposFlag === true) { // x이동거리가 양수면
+                    moveCells('right');
+                } else {
+                    moveCells('left');
+                }
+            } else {
+                if (YposFlag === true) {
+                    moveCells('down');
+                } else {
+                    moveCells('up');
+                }
+            }
+        });
+
     </script>
 </body>
 
