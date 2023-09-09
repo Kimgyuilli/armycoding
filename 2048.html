@@ -84,8 +84,8 @@
     <table id="table"></table>
     <div id="score">0</div>
     <script>
-        $table = document.getElementById('table');
-        $score = document.getElementById('score');
+        const $table = document.getElementById('table');
+        const $score = document.getElementById('score');
         let data = [];
 
         function startGame() {
@@ -94,21 +94,21 @@
                 const rowData = [];
                 data.push(rowData);
                 const $tr = document.createElement('tr');
-                [1, 2, 3, 4].forEach(function () {
+                [1, 2, 3, 4].forEach(() => {
                     rowData.push(0);
                     const $td = document.createElement('td');
                     $tr.appendChild($td);
                 });
                 $fragment.appendChild($tr);
             });
-            $table.appendChild($fragment); //하나씩 데이터에 추가하면 실행 시간이 길어지니 메모리에 그린 다음에 한번에 추가.
+            $table.appendChild($fragment);
             put2ToDataTable();
             draw();
-
         }
 
+
         function put2ToDataTable() {
-            const emptyCells = [];
+            const emptyCells = []; // [[i1, j1], [i2, j2], [i3, j3]]
             data.forEach(function (rowData, i) {
                 rowData.forEach(function (cellData, j) {
                     if (!cellData) {
@@ -116,13 +116,14 @@
                     }
                 });
             });
+            // randomCell === [i, j]
             const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
             data[randomCell[0]][randomCell[1]] = 2;
         }
 
         function draw() {
-            data.forEach(function (rowData, i) {
-                rowData.forEach(function (cellData, j) {
+            data.forEach((rowData, i) => {
+                rowData.forEach((cellData, j) => {
                     const $target = $table.children[i].children[j];
                     if (cellData > 0) {
                         $target.textContent = cellData;
@@ -144,42 +145,123 @@
         ];
         draw();
 
-        let moveStartX;
-        let moveStartY;
-        let XposFlag = false;
-        let YposFlag = false;
 
 
         function moveCells(direction) {
             switch (direction) {
-                case 'left':
+                case 'left': {
                     const newData = [[], [], [], []];
                     data.forEach((rowData, i) => {
                         rowData.forEach((cellData, j) => {
-                            if (cellData) {
-                                newData[i].push(cellData);
+                            if (cellData) { // newData = [2, 2, 4]
+                                const currentRow = newData[i]
+                                const prevData = currentRow[currentRow.length - 1];
+                                if (prevData === cellData) { // 이전 값과 지금 값이 같으면
+                                    const score = parseInt($score.textContent);
+                                    $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                                    currentRow[currentRow.length - 1] *= -2;
+                                } else {
+                                    newData[i].push(cellData);
+                                }
                             }
                         });
                     });
                     console.log(newData);
                     [1, 2, 3, 4].forEach((rowData, i) => {
                         [1, 2, 3, 4].forEach((cellData, j) => {
-                            if (!newData[i][j]) {
-                                data[i][j] = 0;
-                            } else data[i][j] = newData[i][j];
+                            data[i][j] = Math.abs(newData[i][j]) || 0;
                         });
                     });
                     break;
-                case 'right':
+                }
+                case 'right': {
+                    const newData = [[], [], [], []];
+                    data.forEach((rowData, i) => {
+                        rowData.forEach((cellData, j) => {
+                            if (rowData[3 - j]) {
+                                const currentRow = newData[i]
+                                const prevData = currentRow[currentRow.length - 1];
+                                if (prevData === rowData[3 - j]) {
+                                    const score = parseInt($score.textContent);
+                                    $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                                    currentRow[currentRow.length - 1] *= -2;
+                                } else {
+                                    newData[i].push(rowData[3 - j]);
+                                }
+                            }
+                        });
+                    });
+                    console.log(newData);
+                    [1, 2, 3, 4].forEach((rowData, i) => {
+                        [1, 2, 3, 4].forEach((cellData, j) => {
+                            data[i][3 - j] = Math.abs(newData[i][j]) || 0;
+                        });
+                    });
                     break;
-                case 'up':
+                }
+                case 'up': {
+                    const newData = [[], [], [], []];
+                    data.forEach((rowData, i) => {
+                        rowData.forEach((cellData, j) => {
+                            if (cellData) {
+                                const currentRow = newData[j]
+                                const prevData = currentRow[currentRow.length - 1];
+                                if (prevData === cellData) {
+                                    const score = parseInt($score.textContent);
+                                    $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                                    currentRow[currentRow.length - 1] *= -2;
+                                } else {
+                                    newData[j].push(cellData);
+                                }
+                            }
+                        });
+                    });
+                    console.log(newData);
+                    [1, 2, 3, 4].forEach((cellData, i) => {
+                        [1, 2, 3, 4].forEach((rowData, j) => {
+                            data[j][i] = Math.abs(newData[i][j]) || 0;
+                        });
+                    });
                     break;
-                case 'down':
+                }
+                case 'down': {
+                    const newData = [[], [], [], []];
+                    data.forEach((rowData, i) => {
+                        rowData.forEach((cellData, j) => {
+                            if (data[3 - i][j]) {
+                                const currentRow = newData[j];
+                                const prevData = currentRow[currentRow.length - 1];
+                                if (prevData === data[3 - i][j]) {
+                                    const score = parseInt($score.textContent);
+                                    $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                                    currentRow[currentRow.length - 1] *= -2;
+                                } else {
+                                    newData[j].push(data[3 - i][j]);
+                                }
+                            }
+                        });
+                    });
+                    console.log(newData);
+                    [1, 2, 3, 4].forEach((cellData, i) => {
+                        [1, 2, 3, 4].forEach((rowData, j) => {
+                            data[3 - j][i] = Math.abs(newData[i][j]) || 0;
+                        });
+                    });
                     break;
+                }
             }
-            draw();
+            if (data.flat().includes(2048)) { // 승리
+                draw();
+                setTimeout(() => {
+                    alert('축하합니다. 2048을 만들었습니다!');
+                }, 0);
+            } else if (!data.flat().includes(0)) { // 빈 칸이 없으면 패배
+                alert(`패배했습니다... ${$score.textContent}점`);
+            } else {
+                put2ToDataTable();
+                draw();
+            }
         }
-
         window.addEventListener('keyup', (event) => {
             if (event.key === 'ArrowUp') {
                 moveCells('up');
@@ -192,47 +274,24 @@
             }
         });
 
+        let startCoord;
         window.addEventListener('mousedown', (event) => {
-            moveStartX = event.pageX;
-            moveStarty = event.pagey;
-            //startCoord = [event.clientX, event,clientY];
+            startCoord = [event.clientX, event.clientY];
         });
-
         window.addEventListener('mouseup', (event) => {
-            //const endCoord = [event.clientX, event.clientY];
-            //const diffX = endCoord[0] - startCoord[0];
-            //const diffY = endCoord[1] - startCoord[1];
-            //if (diffX < 0 && Math.abs(diffX) > math.abs(diffY)){
-            //   moveCells('left');
-            //} else if (diffX > 0 && Math.abs(diffX) > math.abs(diffY)){
-            //   moveCells('right');
-            //} else if (diffY > 0 && Math.abs(diffX) <= math.abs(diffY)){
-            //   moveCells('down');
-            //} else if (diffY < 0 && Math.abs(diffX) <= math.abs(diffY)){
-            //   moveCells('up');
-
-            if (moveStartX - event.pageX >= 0) { // x 이동거리가 양수일경우
-                XposFlag = true;
-            }
-            if (moveStartY - event.pageY >= 0) { // y 이동거리가 양수일경우
-                YposFlag = true;
-            }
-
-            if (Math.abs(moveStartX - event.page) >= Math.abs(moveStartY - event.pageY)) { // x 이동거리가 y이동거리보다 클 때
-                if (XposFlag === true) { // x이동거리가 양수면
-                    moveCells('right');
-                } else {
-                    moveCells('left');
-                }
-            } else {
-                if (YposFlag === true) {
-                    moveCells('down');
-                } else {
-                    moveCells('up');
-                }
+            const endCoord = [event.clientX, event.clientY];
+            const diffX = endCoord[0] - startCoord[0];
+            const diffY = endCoord[1] - startCoord[1];
+            if (diffX < 0 && Math.abs(diffX) > Math.abs(diffY)) {
+                moveCells('left');
+            } else if (diffX > 0 && Math.abs(diffX) > Math.abs(diffY)) {
+                moveCells('right');
+            } else if (diffY > 0 && Math.abs(diffX) <= Math.abs(diffY)) {
+                moveCells('down');
+            } else if (diffY < 0 && Math.abs(diffX) <= Math.abs(diffY)) {
+                moveCells('up');
             }
         });
-
     </script>
 </body>
 
