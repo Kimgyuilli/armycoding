@@ -6,7 +6,7 @@
     <title>2048</title>
     <style>
         #table {
-            border-collapse: cone;
+            border-collapse: collapse;
             user-select: none;
         }
 
@@ -25,57 +25,57 @@
 
         .color-2 {
             background-color: #eee4da;
-            color-scheme: #776e65;
+            color: #776e65;
         }
 
         .color-4 {
             background-color: #eee1c9;
-            color-scheme: #776e65;
+            color: #776e65;
         }
 
         .color-8 {
             background-color: #f3b27a;
-            color-scheme: 'white';
+            color: 'white';
         }
 
         .color-16 {
             background-color: #f69664;
-            color-scheme: 'white';
+            color: 'white';
         }
 
         .color-32 {
             background-color: #f77c5f;
-            color-scheme: 'white';
+            color: 'white';
         }
 
         .color-64 {
             background-color: #f75f3b;
-            color-scheme: 'white';
+            color: 'white';
         }
 
         .color-128 {
             background-color: #edd073;
-            color-scheme: #776e65;
+            color: #776e65;
         }
 
         .color-256 {
             background-color: #edcc62;
-            color-scheme: #776e65;
+            color: #776e65;
         }
 
         .color-512 {
             background-color: #edc950;
-            color-scheme: #776e65;
+            color: #776e65;
         }
 
         .color-1024 {
             background-color: #edc53f;
-            color-scheme: #776e65;
+            color: #776e65;
         }
 
         .color-2048 {
             background-color: #edc22e;
-            color-scheme: #776e65;
+            color: #776e65;
         }
     </style>
 </head>
@@ -83,11 +83,23 @@
 <body>
     <table id="table"></table>
     <div id="score">0</div>
+    <button id = "back">되돌리기</button>
     <script>
         const $table = document.getElementById('table');
         const $score = document.getElementById('score');
+        const $back = document.getElementById('back');
         let data = [];
+        const history = [];
 
+        $back.addEventListener('click', () => {
+            const prevData = history.pop();
+            if (!prevData) return; //되돌릴게 없으면 종료
+            $score.textContent = prevData.score;
+            data = prevData.table;
+            draw();
+        });
+
+        // $table -> $fragment -> $tr -> $td
         function startGame() {
             const $fragment = document.createDocumentFragment();
             [1, 2, 3, 4].forEach(function () {
@@ -106,7 +118,6 @@
             draw();
         }
 
-
         function put2ToDataTable() {
             const emptyCells = []; // [[i1, j1], [i2, j2], [i3, j3]]
             data.forEach(function (rowData, i) {
@@ -120,7 +131,6 @@
             const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
             data[randomCell[0]][randomCell[1]] = 2;
         }
-
         function draw() {
             data.forEach((rowData, i) => {
                 rowData.forEach((cellData, j) => {
@@ -129,7 +139,7 @@
                         $target.textContent = cellData;
                         $target.className = 'color-' + cellData;
                     } else {
-                        $target.textContentt = '';
+                        $target.textContent = '';
                         $target.className = '';
                     }
                 });
@@ -137,17 +147,21 @@
         }
         startGame();
 
-        data = [
-            [0, 2, 4, 2],
-            [0, 0, 8, 0],
-            [2, 2, 4, 8],
-            [0, 16, 0, 4],
-        ];
+ /**       data = [
+            [2, 2, 4, 2],
+            [2, 2, 8, 2],
+            [2, 1024, 1024, 8],
+            [2, 16, 2, 4],
+        ]; **/
         draw();
 
 
-
         function moveCells(direction) {
+            history.push({
+               table: JSON.paresInt(JSON.stringify(data)),
+               score: $score.textContent,
+            });
+            backupData = $score.textContent;
             switch (direction) {
                 case 'left': {
                     const newData = [[], [], [], []];
